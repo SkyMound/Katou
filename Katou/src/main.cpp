@@ -23,6 +23,15 @@ bool isPasContent;
 int pinVibreur = 27;
 bool estEnAttente;
 
+bool isPresent = false;
+
+
+int valAccFort = 1000; 
+int valAccMoyenne = 100;
+int valAccFaible = 10;
+
+int tempsDebutPresence = 0;
+
 Adafruit_MMA8451 mma = Adafruit_MMA8451();
 
 void oneRonron(bool inspire){
@@ -40,13 +49,13 @@ void oneRonron(bool inspire){
 
 void ronronTask(){
   int tempsDebut = millis();
-  int tempsActuel = millis();
+  int tempsActuel1 = millis();
   bool inspire = true;
-  while(tempsActuel - tempsDebut < ronronDureeTotal){
+  while(tempsActuel1 - tempsDebut < ronronDureeTotal){
     oneRonron(inspire);
     inspire = !inspire;
     delay(ronronInterDuree);
-    int tempsActuel = millis();
+    tempsActuel1 = millis();
   }
 }
 
@@ -87,7 +96,7 @@ void pasContentMode(void * pvParameters){
 
 
 void carresseMode(){
-  myDFPlayer.play(3);
+  myDFPlayer.play(7);
   ronronTask();
 }
 
@@ -144,16 +153,47 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+ int tempsActuel= millis();
+
+
+
   mma.read();
   sensors_event_t event; 
   mma.getEvent(&event);
-  Serial.println(event.acceleration.x);
-  if(mma.x>10){
-    
+  Serial.println(event.acceleration.x); 
+
+
+
+
+
+
+//event.acceleration
+ 
+//Mode présence
+  if((mma.x > valAccFaible) && !isPresent){
+    tempsDebutPresence = millis();
+    isPresent = true;
+    myDFPlayer.volume(10);  //Set volume value. From 0 to 30
+    myDFPlayer.play((rand() % 6));
   }
-  delay(30);
-  
+
+  if((tempsDebutPresence != 0) && ((tempsActuel - tempsDebutPresence) > 60000)){
+    isPresent=false;
+  }
+
+
+//Mode pas content
+  if((mma.x > valAccFort) && !isPresent){
+
+    myDFPlayer.volume(30);  //Set volume value. From 0 to 30
+    myDFPlayer.play(6);
+  }
+
+
+// Mode ronron
+if(mma.x > valAccMoyenne){
+  ronronTask();
+}
 }
 
 
