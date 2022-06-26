@@ -5,9 +5,9 @@
 #include <SPI.h>
 #include <Adafruit_MMA8451.h>
 
-
+#define ronronDureeTotal 30000
 #define ronronDuree 1500
-#define ronronInterDuree 300
+#define ronronInterDuree 200
 
 SoftwareSerial mySoftwareSerial(32, 14); // RX, TX
 DFRobotDFPlayerMini myDFPlayer;
@@ -19,12 +19,12 @@ float accZ = 0;
 
 Servo myServo;
 int pos;
-
+bool isPasContent;
 int pinVibreur = 27;
 
 Adafruit_MMA8451 mma = Adafruit_MMA8451();
 
-void ronron(bool inspire){
+void oneRonron(bool inspire){
   int tempsDebut = millis();
   int tempsActuel = millis();
 
@@ -35,6 +35,21 @@ void ronron(bool inspire){
     inspire ? delay(15) : delay(18);
     tempsActuel = millis();
   }
+}
+
+void ronronTask(){
+  int tempsDebut = millis();
+  int tempsActuel = millis();
+  bool inspire = true;
+  while(tempsActuel - tempsDebut < ronronDureeTotal){
+    oneRonron(inspire);
+    inspire = !inspire;
+    int tempsActuel = millis();
+  }
+}
+
+void battement(){
+
 }
 
 void respirationTask(void * pvParameters){
@@ -55,6 +70,18 @@ void miaulementTask(void * pvParameters){
     
       myDFPlayer.volume(30);  //Set volume value. From 0 to 30
       myDFPlayer.play(1); 
+}
+
+void pasContentMode(void * pvParameters){
+  isPasContent = true;
+  myDFPlayer.volume(30);  //Set volume value. From 0 to 30
+  myDFPlayer.play(6); 
+}
+
+void attenteMode(void * pvParameters){
+
+
+
 }
 
 void setup() {
@@ -112,19 +139,20 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   mma.read();
-  if(mma.x>1){
-    myDFPlayer.play(2);
-    for(int i = 0 ; i < 20 ; i++){
-      ronron(i%2==0);
+  sensors_event_t event; 
+  mma.getEvent(&event);
+  Serial.println(event.acceleration.x);
+  if(mma.x>10){
+    myDFPlayer.play(3);
+
+    for(int i = 0 ; i < 5 ; i++){
+      oneRonron(i%2==0);
       delay(ronronInterDuree);
     }
   }
-
+  delay(30);
   
 }
-
-
-
 
 
 void playMiaou() {
@@ -136,4 +164,3 @@ void playRonron() {
    myDFPlayer.play(2);  //Play the second mp3
    delay(5000);
 }
-
