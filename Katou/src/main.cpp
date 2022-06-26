@@ -21,6 +21,7 @@ Servo myServo;
 int pos;
 bool isPasContent;
 int pinVibreur = 27;
+bool estEnAttente;
 
 Adafruit_MMA8451 mma = Adafruit_MMA8451();
 
@@ -44,16 +45,22 @@ void ronronTask(){
   while(tempsActuel - tempsDebut < ronronDureeTotal){
     oneRonron(inspire);
     inspire = !inspire;
+    delay(ronronInterDuree);
     int tempsActuel = millis();
   }
 }
 
-void battement(){
-
+void battementTask(){
+  while(estEnAttente){
+    digitalWrite(pinVibreur,LOW);
+    delay(200);
+    digitalWrite(pinVibreur,HIGH);
+    delay(200);
+  }
 }
 
 void respirationTask(void * pvParameters){
-  while(1){
+  while(estEnAttente){
     for (pos = 0; pos <= 180; pos += 1) { // goes from 0 degrees to 180 degrees
     // in steps of 1 degree
     myServo.write(pos);              // tell servo to go to position in variable 'pos'
@@ -78,10 +85,10 @@ void pasContentMode(void * pvParameters){
   myDFPlayer.play(6); 
 }
 
-void attenteMode(void * pvParameters){
 
-
-
+void carresseMode(){
+  myDFPlayer.play(3);
+  ronronTask();
 }
 
 void setup() {
@@ -143,12 +150,7 @@ void loop() {
   mma.getEvent(&event);
   Serial.println(event.acceleration.x);
   if(mma.x>10){
-    myDFPlayer.play(3);
-
-    for(int i = 0 ; i < 5 ; i++){
-      oneRonron(i%2==0);
-      delay(ronronInterDuree);
-    }
+    
   }
   delay(30);
   
