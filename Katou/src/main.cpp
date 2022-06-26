@@ -28,11 +28,11 @@ void ronron(bool inspire){
   int tempsDebut = millis();
   int tempsActuel = millis();
 
-  while(tempsActuel - tempsDebut < (inspire : ronronDuree -200 ? ronronDuree)){
+  while(tempsActuel - tempsDebut < (inspire ? ronronDuree -200 : ronronDuree)){
     digitalWrite(pinVibreur,LOW);
-    inspire : delay(15) ? delay(18);
+    inspire ? delay(15) : delay(18);
     digitalWrite(pinVibreur,HIGH);
-    inspire : delay(15) ? delay(18);
+    inspire ? delay(15) : delay(18);
     tempsActuel = millis();
   }
 }
