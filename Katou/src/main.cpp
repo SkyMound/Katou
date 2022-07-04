@@ -19,12 +19,16 @@ float accZ = 0;
 
 Servo myServo;
 int pos;
-bool isPasContent;
 int pinVibreur = 27;
-bool estEnAttente;
 
+
+bool isPasContent =false;
+bool estEnAttente = true;
 bool isPresent = false;
 
+TaskHandle_t* respirationHandler = NULL;
+TaskHandle_t* ronronHandler = NULL;
+TaskHandle_t* battementHandler = NULL;
 
 int valAccFort = 1000; 
 int valAccMoyenne = 100;
@@ -34,20 +38,21 @@ int tempsDebutPresence = 0;
 
 Adafruit_MMA8451 mma = Adafruit_MMA8451();
 
+//---Parti ronronnement---
 void oneRonron(bool inspire){
   int tempsDebut = millis();
   int tempsActuel = millis();
 
   while(tempsActuel - tempsDebut < (inspire ? ronronDuree -200 : ronronDuree)){
     digitalWrite(pinVibreur,LOW);
-    inspire ? delay(15) : delay(18);
+    inspire ? delay(15) : delay(17);
     digitalWrite(pinVibreur,HIGH);
-    inspire ? delay(15) : delay(18);
+    inspire ? delay(15) : delay(17);
     tempsActuel = millis();
   }
 }
 
-void ronronTask(){
+void ronronTask(void * pvParameters){
   int tempsDebut = millis();
   int tempsActuel1 = millis();
   bool inspire = true;
@@ -57,9 +62,22 @@ void ronronTask(){
     delay(ronronInterDuree);
     tempsActuel1 = millis();
   }
+  startBattement();
 }
 
-void battementTask(){
+void startRonron(){
+  xTaskCreate(
+                  ronronTask,     //Function to implement the task.  线程对应函数名称(不能有返回值)
+                  "Tache de respiration",   //线程名称
+                  4096,      // The size of the task stack specified as the number of * bytes.任务堆栈的大小(字节)
+                  NULL,      // Pointer that will be used as the parameter for the task * being created.  创建作为任务输入参数的指针
+                  1,         // Priority of the task.  任务的优先级
+                  ronronHandler
+              );
+}
+
+//---Parti battement de coeur---
+void battementTask(void * pvParameters){
   while(estEnAttente){
     digitalWrite(pinVibreur,LOW);
     delay(200);
@@ -68,6 +86,25 @@ void battementTask(){
   }
 }
 
+void startBattement(){
+  xTaskCreate(
+                    battementTask,     //Function to implement the task.  线程对应函数名称(不能有返回值)
+                    "Tache de battement de coeur",   //线程名称
+                    4096,      // The size of the task stack specified as the number of * bytes.任务堆栈的大小(字节)
+                    NULL,      // Pointer that will be used as the parameter for the task * being created.  创建作为任务输入参数的指针
+                    1,         // Priority of the task.  任务的优先级
+                    battementHandler
+                );
+}
+
+void stopBattement(){
+  if(battementHandler != NULL){
+    vTaskDelete(battementHandler);  
+  }
+}
+
+
+//---Parti respiration--- 
 void respirationTask(void * pvParameters){
   while(estEnAttente){
     for (pos = 0; pos <= 180; pos += 1) { // goes from 0 degrees to 180 degrees
@@ -82,23 +119,23 @@ void respirationTask(void * pvParameters){
   }
 }
 
-void miaulementTask(void * pvParameters){
-    
-      myDFPlayer.volume(30);  //Set volume value. From 0 to 30
-      myDFPlayer.play(1); 
+void startRespiration(){
+  xTaskCreate(
+                  respirationTask,     //Function to implement the task.  线程对应函数名称(不能有返回值)
+                  "Tache de respiration",   //线程名称
+                  4096,      // The size of the task stack specified as the number of * bytes.任务堆栈的大小(字节)
+                  NULL,      // Pointer that will be used as the parameter for the task * being created.  创建作为任务输入参数的指针
+                  1,         // Priority of the task.  任务的优先级
+                  respirationHandler
+              );
 }
 
-void pasContentMode(void * pvParameters){
-  isPasContent = true;
-  myDFPlayer.volume(30);  //Set volume value. From 0 to 30
-  myDFPlayer.play(6); 
+void stopRespiration(){
+  if(respirationHandler != NULL){
+    vTaskDelete(respirationHandler);  
+  }
 }
 
-
-void carresseMode(){
-  myDFPlayer.play(7);
-  ronronTask();
-}
 
 void setup() {
   //Gyroscope
@@ -131,25 +168,8 @@ void setup() {
   myDFPlayer.volume(30);  //Set volume value. From 0 to 30
   // myDFPlayer.play(2); 
   
-
-  xTaskCreatePinnedToCore(
-                  respirationTask,     //Function to implement the task.  线程对应函数名称(不能有返回值)
-                  "Tache de respiration",   //线程名称
-                  4096,      // The size of the task stack specified as the number of * bytes.任务堆栈的大小(字节)
-                  NULL,      // Pointer that will be used as the parameter for the task * being created.  创建作为任务输入参数的指针
-                  1,         // Priority of the task.  任务的优先级
-                  NULL,      // Task handler.  任务句柄
-                  0);
-  
-//   xTaskCreatePinnedToCore(
-//                   miaulementTask,     //Function to implement the task.  线程对应函数名称(不能有返回值)
-//                   "Tache de miaulement",   //线程名称
-//                   4096,      // The size of the task stack specified as the number of * bytes.任务堆栈的大小(字节)
-//                   NULL,      // Pointer that will be used as the parameter for the task * being created.  创建作为任务输入参数的指针
-//                   1,         // Priority of the task.  任务的优先级
-//                   NULL,      // Task handler.  任务句柄
-//                   0);
-  
+  startRespiration();
+  startBattement();
 }
 
 void loop() {
@@ -163,13 +183,8 @@ void loop() {
   Serial.println(event.acceleration.x); 
 
 
-
-
-
-
-//event.acceleration
  
-//Mode présence
+//Mode détection de présence
   if((mma.x > valAccFaible) && !isPresent){
     tempsDebutPresence = millis();
     isPresent = true;
@@ -177,32 +192,22 @@ void loop() {
     myDFPlayer.play((rand() % 6));
   }
 
+  //Le mode présence ne peut s'activer qu'une fois toute les minutes
   if((tempsDebutPresence != 0) && ((tempsActuel - tempsDebutPresence) > 60000)){
     isPresent=false;
   }
 
 
 //Mode pas content
-  if((mma.x > valAccFort) && !isPresent){
-
+  if((mma.x > valAccFort)){
     myDFPlayer.volume(30);  //Set volume value. From 0 to 30
     myDFPlayer.play(6);
   }
 
 
-// Mode ronron
-if(mma.x > valAccMoyenne){
-  ronronTask();
-}
-}
-
-
-void playMiaou() {
-   myDFPlayer.play(1);  //Play the first mp3
-   delay(2000);
-}
-
-void playRonron() {
-   myDFPlayer.play(2);  //Play the second mp3
-   delay(5000);
+  // Mode Ronronnement
+  if(mma.x > valAccMoyenne && mma.x < valAccFort){
+    stopBattement();
+    startRonron();
+  }
 }
