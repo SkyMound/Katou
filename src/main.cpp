@@ -9,12 +9,12 @@ void setup() {
   Serial.println("Starting...");
   respirationInit();
   miaulementInit();
+  ronronInit();
   myDFPlayer.volume(10);
-
 }
 
 void loop() {
-  // ronronTask();
+  startRonron();
   // battementTask();
   // respirationTask();
   // printState();
