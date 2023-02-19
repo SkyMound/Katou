@@ -5,21 +5,25 @@
 #include "miaulement.hpp"
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   Serial.println("Starting...");
-  pinMode(PIN_VIBREUR,OUTPUT);
-  pinMode(LED_BUILTIN,OUTPUT);
-  // respirationInit();
+  respirationInit();
   miaulementInit();
-  playSound(6,28);
+  myDFPlayer.volume(10);
+
 }
 
 void loop() {
-  delay(1000);
   // ronronTask();
   // battementTask();
-  //respirationTask();
+  // respirationTask();
+  // printState();
+  // myDFPlayer.play(1);
+  // delay(1000);
+  playSound(1,10);
+  delay(1000);
+  myDFPlayer.play(3);
 
-  //delay(1000);
+  delay(1000);
   // put your main code here, to run repeatedly:
 }

@@ -6,6 +6,10 @@
 
 #define PIN_VIBREUR 27
 
+void ronronInit(){
+  pinMode(PIN_VIBREUR,OUTPUT);
+}
+
 void oneRonron(bool inspire){
     int tempsDebut = millis();
     int tempsActuel = millis();
