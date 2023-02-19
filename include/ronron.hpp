@@ -7,10 +7,16 @@
 #define PIN_VIBREUR 27
 
 TaskHandle_t* ronronHandler = NULL;
+void stopRonron();
+void ronronInit();
+void startRonron();
+void oneRonron(bool inspire);
+void ronronTask(void * pvParameters);
 
 void ronronInit(){
   pinMode(PIN_VIBREUR,OUTPUT);
 }
+
 
 void startRonron(){
   xTaskCreate(
@@ -28,6 +34,7 @@ void stopRonron(){
     vTaskDelete(ronronHandler);  
   }
 }
+
 
 void oneRonron(bool inspire){
     int tempsDebut = millis();
@@ -56,4 +63,5 @@ void ronronTask(void * pvParameters){
     tempsActuel1 = millis();
   }
 }
+
 

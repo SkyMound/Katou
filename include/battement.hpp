@@ -5,6 +5,9 @@
 #define PIN_VIBREUR 27
 
 TaskHandle_t* battementHandler = NULL;
+void battementTask(void * pvParameters);
+void startBattement();
+void stopBattement();
 
 void startBattement(){
   xTaskCreate(

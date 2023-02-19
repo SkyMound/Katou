@@ -4,13 +4,17 @@
 #define PIN_SERVO 15
 
 #define INIT_TIME 1000
-#define INIT_POS 130
-#define SERVO_SLOW 20
+#define INIT_POS 0//130
+#define SERVO_SLOW 10
 #define PAUSE 800
-#define AMPLITUDE 30
+#define AMPLITUDE 180//30
 
 Servo myServo;
 TaskHandle_t* respirationHandler = NULL;
+void startRespiration();
+void stopRespiration();
+void respirationInit();
+void respirationTask(void * pvParameters);
 
 void startRespiration(){
   xTaskCreate(
@@ -23,7 +27,7 @@ void startRespiration(){
               );
 }
 
-void stopBattement(){
+void stopRespiration(){
     if(respirationHandler != NULL){
     vTaskDelete(respirationHandler);  
   }

@@ -3,6 +3,8 @@
 
 #define PIN_RX 16
 #define PIN_TX 17
+#define RONRON_SOUND_1 7
+#define RONRON_SOUND_2 8
 
 DFRobotDFPlayerMini myDFPlayer;
 SoftwareSerial mySoftwareSerial(PIN_RX, PIN_TX); // RX, TX
@@ -18,7 +20,8 @@ void miaulementInit(){
 void playSound(int soundIndex,int volume)
 {
     if(myDFPlayer.available()){
-        
+        myDFPlayer.volume(volume);
+        myDFPlayer.play(soundIndex);
         Serial.println("Sound Played");
         printDetail(myDFPlayer.readType(), myDFPlayer.read()); 
     }else
