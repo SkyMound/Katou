@@ -39,8 +39,10 @@ void loop() {
   
   /* Display the results (acceleration is measured in m/s^2) */
   float norm = sqrt(pow(mma.x_g,2)+pow(mma.y_g,2)+pow(mma.z_g,2));
+
+  float godAcceleration = abs(norm-1);
   // Serial.print("acc: "); Serial.print(abs(abs(event.acceleration.x+event.acceleration.y+event.acceleration.z)-9.8f));Serial.println(" m/s^2 ");
-  Serial.print("acc: "); Serial.print(norm);Serial.print(" "); Serial.print(event.acceleration.y);Serial.print(" "); Serial.print(event.acceleration.z);Serial.println(" m/s^2 ");
+  Serial.print("acc: "); Serial.print(godAcceleration);Serial.print(" "); Serial.print(event.acceleration.y);Serial.print(" "); Serial.print(event.acceleration.z);Serial.println(" m/s^2 ");
   
   // Serial.print("x_g: "); Serial.print(mma.x_g); Serial.print(" ");
   // Serial.print("Y_g: "); Serial.print(mma.y_g); Serial.print(" ");
