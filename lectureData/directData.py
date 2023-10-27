@@ -40,6 +40,8 @@ def animate(i):
             ax1.plot(liste_temps,X)
             # ax1.plot(liste_temps,Y)
             # ax1.plot(liste_temps,Z)
+            if temps_reel > 10:
+                ax1.axvline(liste_temps[0]+10, color='red', linestyle='-')
             ax1.set_xlabel("Temps (s)")
             ax1.set_ylabel("Accélération (m/s²)")
             ax1.set_title("Accélération en fonction du temps")
