@@ -48,10 +48,11 @@ void loop() {
   float gyroX = event.gyro.x;
   float gyroY = event.gyro.y;
   float gyroZ = event.gyro.z;
-  Serial.print("acc: "); Serial.print(event.gyro.x); Serial.print(" ");
-  Serial.print("Y: "); Serial.print(event.gyro.y); Serial.print(" ");
-  Serial.print("Z: "); Serial.print(event.gyro.z); Serial.print(" ");
+  Serial.print("acc: "); Serial.print(accelerationX - event.gyro.x); Serial.print(" ");
+  Serial.print("Y: "); Serial.print(accelerationY- event.gyro.y); Serial.print(" ");
+  Serial.print("Z: "); Serial.print(accelerationZ - event.gyro.z); Serial.print(" ");
   Serial.println("m/s^2 ");
+
   // filter.updateIMU(gyroX,gyroY,gyroZ,accelerationX, accelerationY, accelerationZ);
   // // print the heading, pitch and roll
   // float roll, pitch, heading;
