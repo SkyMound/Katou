@@ -19,11 +19,11 @@ def recup_port():
         return None
     
 def animate(i):
-    global X,Y,Z,liste_temps
-    allData = recup_port()
+
+    global X,Y,Z,liste_temps,allData
     data = allData.readline()
-    if(data.startswith("acc")) :
-        data = data.strip().split()
+    data = data.strip().split()
+    if(data[0].decode()=="acc:"):
         if len(data)!=0:
             x = float(data[1].decode())
             y = float(data[3].decode())
@@ -34,8 +34,8 @@ def animate(i):
             temps_mesure = time.time()
             liste_temps.append(temps_mesure)
             temps_reel = temps_mesure - liste_temps[0]
-            print(temps_reel)
-            print(x,y,z)
+            # print(temps_reel)
+            # print(x,y,z)
             ax1.clear()
             ax1.plot(liste_temps,X)
             ax1.plot(liste_temps,Y)
@@ -53,10 +53,10 @@ X = []
 Y = []
 Z = []
 liste_temps = []
-
+allData = recup_port()
 fig = plt.figure()
 ax1 = fig.add_subplot(1,1,1)
-ani = animation.FuncAnimation(fig, animate, interval=1000)
+ani = animation.FuncAnimation(fig, animate, interval=100)
 plt.show()
     
 
