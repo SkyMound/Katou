@@ -52,15 +52,16 @@ void oneRonron(bool inspire){
 }
 
 void ronronTask(void * pvParameters){
-//   playSound(7,30);
-  int tempsDebut = millis();
-  int tempsActuel1 = millis();
-  bool inspire = true;
-  while(tempsActuel1 - tempsDebut < RONRON_DUREE_TOTAL){
-    oneRonron(inspire);
-    inspire = !inspire;
-    delay(RONRON_PAUSE);
-    tempsActuel1 = millis();
+  while(true){
+    int tempsDebut = millis();
+    int tempsActuel1 = millis();
+    bool inspire = true;
+    while(tempsActuel1 - tempsDebut < RONRON_DUREE_TOTAL){
+      oneRonron(inspire);
+      inspire = !inspire;
+      delay(RONRON_PAUSE);
+      tempsActuel1 = millis();
+    }
   }
 }
 

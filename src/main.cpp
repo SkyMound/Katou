@@ -7,14 +7,18 @@
 void setup() {
   Serial.begin(115200);
   Serial.println("Starting...");
-  respirationInit();
-  miaulementInit();
+  //miaulementInit();
+  mySoftwareSerial.begin(9600, SWSERIAL_8N1, PIN_RX, PIN_TX, false, 256);
+  Serial.println(mySoftwareSerial.available());
+  myDFPlayer.begin(mySoftwareSerial);
+  Serial.println(myDFPlayer.available());
   ronronInit();
   myDFPlayer.volume(10);
-  startRespiration();
-  startRonron();
-  myDFPlayer.volume(30);
-  myDFPlayer.play(RONRON_SOUND_2);
+  //startRonron();
+  startBattement();
+  delay(5000);
+  stopBattement();
+  //myDFPlayer.play(RONRON_SOUND_2);
 }
 
 void loop() {
