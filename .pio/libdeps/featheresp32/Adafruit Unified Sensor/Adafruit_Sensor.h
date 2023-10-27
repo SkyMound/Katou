@@ -30,7 +30,7 @@
 #endif
 
 /* Constants */
-#define SENSORS_GRAVITY_EARTH (9.80665F) /**< Earth's gravity in m/s^2 */
+#define SENSORS_GRAVITY_EARTH (0.0F) /**< Earth's gravity in m/s^2 */
 #define SENSORS_GRAVITY_MOON (1.6F)      /**< The moon's gravity in m/s^2 */
 #define SENSORS_GRAVITY_SUN (275.0F)     /**< The sun's gravity in m/s^2 */
 #define SENSORS_GRAVITY_STANDARD (SENSORS_GRAVITY_EARTH)
