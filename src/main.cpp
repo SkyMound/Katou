@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <Adafruit_MMA8451.h>
 #include <MadgwickAHRS.h>
+#include <cmath>
 #include "ronron.hpp"
 #include "battement.hpp"
 #include "respiration.hpp"
@@ -25,9 +26,9 @@ void setup() {
   ronronInit();
   myDFPlayer.volume(10);
   //startRonron();
-  startBattement();
-  delay(5000);
-  stopBattement();
+  //startBattement();
+  //delay(5000);
+  //stopBattement();
   //myDFPlayer.play(RONRON_SOUND_2);
 }
 
@@ -38,34 +39,25 @@ void loop() {
 
   /* Display the results (acceleration is measured in m/s^2) */
   
-  // Serial.print("acc: "); Serial.print(event.acceleration.x); Serial.print(" ");
-  // Serial.print("Y: "); Serial.print(event.acceleration.y); Serial.print(" ");
-  // Serial.print("Z: "); Serial.print(event.acceleration.z); Serial.print(" ");
-  // Serial.println("m/s^2 ");
-  float accelerationX = event.acceleration.x;
-  float accelerationY = event.acceleration.y;
-  float accelerationZ = event.acceleration.z;
-  float gyroX = event.gyro.x;
-  float gyroY = event.gyro.y;
-  float gyroZ = event.gyro.z;
-  Serial.print("acc: "); Serial.print(accelerationX - event.gyro.x); Serial.print(" ");
-  Serial.print("Y: "); Serial.print(accelerationY- event.gyro.y); Serial.print(" ");
-  Serial.print("Z: "); Serial.print(accelerationZ - event.gyro.z); Serial.print(" ");
+  Serial.print("acc: "); Serial.print(abs(mma.x_g+mma.y_g+mma.z_g)-1); Serial.print(" ");
+  Serial.print("Y: "); Serial.print(abs(mma.x_g+mma.y_g+mma.z_g)-1); Serial.print(" ");
+  Serial.print("Z: "); Serial.print(abs(mma.x_g+mma.y_g+mma.z_g)-1); Serial.print(" ");
   Serial.println("m/s^2 ");
+  
+  // Serial.print("x_g: "); Serial.print(mma.x_g); Serial.print(" ");
+  // Serial.print("Y_g: "); Serial.print(mma.y_g); Serial.print(" ");
+  // Serial.print("Z_g: "); Serial.print(mma.z_g); Serial.print(" ");
+  // //Serial.print("angle: "); Serial.print(angle_degres); Serial.print(" ");
+  // Serial.println("m/s^2 ");
 
-  // filter.updateIMU(gyroX,gyroY,gyroZ,accelerationX, accelerationY, accelerationZ);
-  // // print the heading, pitch and roll
-  // float roll, pitch, heading;
-  // roll = filter.getRoll();
-  // pitch = filter.getPitch();
-  // heading = filter.getYaw();
+
   // Serial.print("Orientation: ");
-  // Serial.print(heading);
+  // Serial.print(event.acceleration.heading);
   // Serial.print(" ");
-  // Serial.print(pitch);
+  // Serial.print(event.acceleration.pitch);
   // Serial.print(" ");
-  // Serial.println(roll);
+  // Serial.println(event.acceleration.roll);
   // playSound(RONRON_SOUND_1,30);
-  delay(100);
+  delay(500);
   // put your main code here, to run repeatedly:
 }
