@@ -27,8 +27,11 @@ void stopBattement(){
 }
 
 void battementTask(void * pvParameters){
+  while(true){
+
     digitalWrite(PIN_VIBREUR,LOW);
     delay(BATTEMENT_FREQ);
     digitalWrite(PIN_VIBREUR,HIGH);
     delay(BATTEMENT_FREQ);
+  }
 }
