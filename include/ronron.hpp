@@ -6,7 +6,8 @@
 
 #define PIN_VIBREUR 27
 
-TaskHandle_t* ronronHandler = NULL;
+TaskHandle_t ronronHandler = NULL;
+bool isRonronActive = false;
 void stopRonron();
 void ronronInit();
 void startRonron();
@@ -19,19 +20,23 @@ void ronronInit(){
 
 
 void startRonron(){
-  xTaskCreate(
-                  ronronTask,     //Function to implement the task.  线程对应函数名称(不能有返回值)
-                  "Tache de ronronnement",   //线程名称
-                  4096,      // The size of the task stack specified as the number of * bytes.任务堆栈的大小(字节)
-                  NULL,      // Pointer that will be used as the parameter for the task * being created.  创建作为任务输入参数的指针
-                  1,         // Priority of the task.  任务的优先级
-                  ronronHandler
-              );
+  if(!isRonronActive){
+    isRonronActive = true;
+    xTaskCreate(
+                    ronronTask,     //Function to implement the task.  线程对应函数名称(不能有返回值)
+                    "Tache de ronronnement",   //线程名称
+                    4096,      // The size of the task stack specified as the number of * bytes.任务堆栈的大小(字节)
+                    NULL,      // Pointer that will be used as the parameter for the task * being created.  创建作为任务输入参数的指针
+                    1,         // Priority of the task.  任务的优先级
+                    &ronronHandler
+                );
+  }
 }
 
 void stopRonron(){
-  if(ronronHandler != NULL){
+  if(ronronHandler != NULL && isRonronActive){
     vTaskDelete(ronronHandler);  
+    isRonronActive = false;
   }
 }
 
