@@ -39,10 +39,7 @@ void loop() {
 
   /* Display the results (acceleration is measured in m/s^2) */
   
-  Serial.print("acc: "); Serial.print(abs(mma.x_g+mma.y_g+mma.z_g)-1); Serial.print(" ");
-  Serial.print("Y: "); Serial.print(abs(mma.x_g+mma.y_g+mma.z_g)-1); Serial.print(" ");
-  Serial.print("Z: "); Serial.print(abs(mma.x_g+mma.y_g+mma.z_g)-1); Serial.print(" ");
-  Serial.println("m/s^2 ");
+  Serial.print("acc: "); Serial.print(abs(abs(mma.x_g+mma.y_g+mma.z_g)-1));Serial.println("m/s^2 ");
   
   // Serial.print("x_g: "); Serial.print(mma.x_g); Serial.print(" ");
   // Serial.print("Y_g: "); Serial.print(mma.y_g); Serial.print(" ");
