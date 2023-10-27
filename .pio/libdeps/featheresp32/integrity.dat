@@ -1,5 +1,6 @@
 dfrobot/DFRobotDFPlayerMini@^1.0.5
-adafruit/Adafruit MMA8451 Library@^1.2.3
-plerup/EspSoftwareSerial@^7.0.0
+arduino-libraries/Madgwick@^1.2.0
 SPI
+plerup/EspSoftwareSerial@^7.0.0
+adafruit/Adafruit MMA8451 Library@^1.2.3
 madhephaestus/ESP32Servo@^0.12.1
