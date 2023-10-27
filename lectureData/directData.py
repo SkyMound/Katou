@@ -20,17 +20,13 @@ def recup_port():
     
 def animate(i):
 
-    global X,Y,Z,liste_temps,allData
+    global X,liste_temps,allData
     data = allData.readline()
     data = data.strip().split()
     if(data[0].decode()=="acc:"):
         if len(data)!=0:
             x = float(data[1].decode())
-            y = float(data[3].decode())
-            z = float(data[5].decode())
             X.append(x)
-            Y.append(y)
-            Z.append(z)
             temps_mesure = time.time()
             liste_temps.append(temps_mesure)
             temps_reel = temps_mesure - liste_temps[0]
@@ -38,20 +34,16 @@ def animate(i):
             # print(x,y,z)
             ax1.clear()
             ax1.plot(liste_temps,X)
-            ax1.plot(liste_temps,Y)
-            ax1.plot(liste_temps,Z)
             ax1.set_xlabel("Temps (s)")
             ax1.set_ylabel("Accélération (m/s²)")
             ax1.set_title("Accélération en fonction du temps")
-            ax1.legend(["X","Y","Z"])
+            ax1.legend(["X"])
             ax1.grid()
 
 
 temps_reel = 0
 temps_aquisition = 100
 X = []
-Y = []
-Z = []
 liste_temps = []
 allData = recup_port()
 fig = plt.figure()
