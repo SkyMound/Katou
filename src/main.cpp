@@ -8,9 +8,16 @@
 #define ALLUME_MIAULEMENT_FREQ 300000
 #define DANS_LES_MAINS_MIAULEMENT_FREQ 30000
 
-#define DANS_LES_MAINS_TIMER 60000
-#define RONRON_TIMER 60000
+#define DANS_LES_MAINS_TIMER 15000
+#define RONRON_TIMER 15000
+#define MODE_TIMER 15000
+#define ENERVE_TIMER 15000
+#define DANS_LES_MAINS_TIMER_MIN 5000
 
+#define ENERVE_THRESHOLD 3.0
+#define DANS_LES_MAINS_THRESHOLD 0.5
+#define RONRON_THRESHOLD 0.9
+#define NO_INTERACTION_THRESHOLD 0.15
 
 typedef enum{
   MODE_ALLUME = (0),
@@ -22,8 +29,9 @@ typedef enum{
 Adafruit_MMA8451 mma = Adafruit_MMA8451();
 int lastMeow = millis();
 int modeChanged = millis();
-KatouMode currentMode;
+KatouMode currentMode = MODE_ALLUME;
 bool hasAngryMeow = false;
+bool isRonronning = false;
 
 
 void setup() {
@@ -58,75 +66,96 @@ void loop() {
   float accelerationNorm = sqrt(pow(mma.x_g,2)+pow(mma.y_g,2)+pow(mma.z_g,2));
   float accelerationGravityless = abs(accelerationNorm-1);
 
-
-  if(accelerationGravityless < 0.1 && currentTime - lastMeow > RONRON_TIMER){
-    currentMode = MODE_ALLUME;
-    modeChanged = millis();
-    Serial.println("Mode allume");
-  }
-  else if(accelerationGravityless < 0.25 && currentTime - lastMeow > RONRON_TIMER){
-    Serial.println("Mode dans les mains");
-    modeChanged = millis();
-    currentMode = MODE_DANS_LES_MAINS;
-  }
-  else if(accelerationGravityless < 0.5 && currentMode == MODE_DANS_LES_MAINS && currentTime - lastMeow > RONRON_TIMER){
-    Serial.println("Mode ronron");
-    modeChanged = millis();
-    currentMode = MODE_RONRON;
-  }
-  else if(accelerationGravityless > 1.25){
-    Serial.println("Mode enerve");
-    modeChanged = millis();
-    currentMode = MODE_ENERVE;
-  }
-
-
-
-  if(currentMode = MODE_ALLUME){
-    startBattement();
+  // Serial.print("acc: ");
+  // Serial.print(accelerationGravityless);
+  // Serial.println("");
+  if(currentMode == MODE_ALLUME){
     stopRonron();
+    startBattement();
     if(currentTime-lastMeow > ALLUME_MIAULEMENT_FREQ) {
       myDFPlayer.volume(15);
       myDFPlayer.play(5);
       lastMeow = currentTime;
     }
+
+    if(accelerationGravityless > ENERVE_THRESHOLD){
+      currentMode = MODE_ENERVE;
+      Serial.println("Mode enervé");
+      modeChanged = millis();
+    }
+    else if(accelerationGravityless > DANS_LES_MAINS_THRESHOLD){
+      currentMode = MODE_DANS_LES_MAINS;
+      Serial.println("Mode dans les mains");
+      modeChanged = millis();
+    }
   }
-  else if(currentMode = MODE_DANS_LES_MAINS){
-    startBattement();
+  else if(currentMode == MODE_DANS_LES_MAINS){
     stopRonron();
+    startBattement();
     if(currentTime - lastMeow > DANS_LES_MAINS_MIAULEMENT_FREQ){
       myDFPlayer.volume(10);
       myDFPlayer.play(1);
       lastMeow = currentTime;
     }
-    if(currentTime - modeChanged > DANS_LES_MAINS_TIMER ){
-      currentMode = MODE_ALLUME;
+    if(accelerationGravityless < NO_INTERACTION_THRESHOLD ){
+      if(currentTime - modeChanged > DANS_LES_MAINS_TIMER){
+        currentMode = MODE_ALLUME;
+        Serial.println("Mode allume");
+        modeChanged = millis();
+      }
+    }
+    else if(accelerationGravityless < RONRON_THRESHOLD && currentTime - modeChanged > DANS_LES_MAINS_TIMER_MIN){
+      currentMode = MODE_RONRON;
+      Serial.println("Mode ronron");
       modeChanged = millis();
-      Serial.println("Mode allume");
-
+    }
+    else if(accelerationGravityless > ENERVE_THRESHOLD){
+      currentMode = MODE_ENERVE;
+      Serial.println("Mode enervé");
+      modeChanged = millis();
     }
   }
-  else if(currentMode = MODE_RONRON){
+  else if(currentMode == MODE_RONRON){
     stopBattement();
     startRonron();
-    if(myDFPlayer.available()){
+    if(!isRonronning){
+      isRonronning = true;
+      Serial.println("Ronronnement");
       myDFPlayer.volume(25);
-      myDFPlayer.play(8);      
+      myDFPlayer.loop(7);      
     }
-    if(currentTime - modeChanged > RONRON_TIMER ){
-      currentMode = MODE_DANS_LES_MAINS;
+    isRonronning = true;
+    if(accelerationGravityless > ENERVE_THRESHOLD){
+      isRonronning = false;
+      currentMode = MODE_ENERVE;
+      myDFPlayer.stop();
+      Serial.println("Mode enervé");
       modeChanged = millis();
+    }
+    else if(accelerationGravityless > RONRON_THRESHOLD){
+      modeChanged = millis();
+    }
+    else if(accelerationGravityless < NO_INTERACTION_THRESHOLD && currentTime - modeChanged > RONRON_TIMER ){
+      currentMode = MODE_DANS_LES_MAINS;
+      isRonronning = false;
+      modeChanged = millis();
+      myDFPlayer.stop();
       Serial.println("Mode dans les mains");
-
     }
   }
-  else if(currentMode = MODE_ENERVE){
-    startBattement();
+  else if(currentMode == MODE_ENERVE){
     stopRonron();
+    startBattement();
     if(!hasAngryMeow){
       myDFPlayer.volume(25);
       myDFPlayer.play(6);
       hasAngryMeow = true;
+    }
+    if(currentTime - modeChanged > ENERVE_TIMER ){
+      hasAngryMeow = false;
+      currentMode = MODE_ALLUME;
+      modeChanged = millis();
+      Serial.println("Mode allumé");
     }
   }
   
