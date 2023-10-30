@@ -5,18 +5,18 @@
 #include "respiration.hpp"
 #include "miaulement.hpp"
 
-#define ALLUME_MIAULEMENT_FREQ 300000
-#define DANS_LES_MAINS_MIAULEMENT_FREQ 30000
+#define ALLUME_MIAULEMENT_FREQ 30000
+#define DANS_LES_MAINS_MIAULEMENT_FREQ 20000
 
-#define DANS_LES_MAINS_TIMER 15000
-#define RONRON_TIMER 15000
-#define MODE_TIMER 15000
+#define DANS_LES_MAINS_TIMER 30000
+#define RONRON_TIMER 30000
+#define MODE_TIMER 30000
 #define ENERVE_TIMER 15000
 #define DANS_LES_MAINS_TIMER_MIN 5000
 
-#define ENERVE_THRESHOLD 3.0
+#define ENERVE_THRESHOLD 2.0
 #define DANS_LES_MAINS_THRESHOLD 0.5
-#define RONRON_THRESHOLD 0.9
+#define RONRON_THRESHOLD 0.7
 #define NO_INTERACTION_THRESHOLD 0.15
 
 typedef enum{
@@ -93,7 +93,7 @@ void loop() {
     stopRonron();
     startBattement();
     if(currentTime - lastMeow > DANS_LES_MAINS_MIAULEMENT_FREQ){
-      myDFPlayer.volume(10);
+      myDFPlayer.volume(20);
       myDFPlayer.play(1);
       lastMeow = currentTime;
     }
@@ -104,14 +104,14 @@ void loop() {
         modeChanged = millis();
       }
     }
-    else if(accelerationGravityless < RONRON_THRESHOLD && currentTime - modeChanged > DANS_LES_MAINS_TIMER_MIN){
-      currentMode = MODE_RONRON;
-      Serial.println("Mode ronron");
-      modeChanged = millis();
-    }
     else if(accelerationGravityless > ENERVE_THRESHOLD){
       currentMode = MODE_ENERVE;
       Serial.println("Mode enervé");
+      modeChanged = millis();
+    }
+    else if(accelerationGravityless > RONRON_THRESHOLD && currentTime - modeChanged > DANS_LES_MAINS_TIMER_MIN){
+      currentMode = MODE_RONRON;
+      Serial.println("Mode ronron");
       modeChanged = millis();
     }
   }
@@ -121,7 +121,7 @@ void loop() {
     if(!isRonronning){
       isRonronning = true;
       Serial.println("Ronronnement");
-      myDFPlayer.volume(25);
+      myDFPlayer.volume(30);
       myDFPlayer.loop(7);      
     }
     isRonronning = true;
