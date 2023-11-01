@@ -17,7 +17,7 @@
 #define ENERVE_TIMER 15000
 #define DANS_LES_MAINS_TIMER_MIN 5000
 
-#define ENERVE_THRESHOLD 1.8
+#define ENERVE_THRESHOLD 2.0
 #define DANS_LES_MAINS_THRESHOLD 0.5
 #define RONRON_THRESHOLD 0.7
 #define NO_INTERACTION_THRESHOLD 0.15
@@ -70,9 +70,9 @@ void loop() {
   float accelerationNorm = sqrt(pow(mma.x_g,2)+pow(mma.y_g,2)+pow(mma.z_g,2));
   float accelerationGravityless = abs(accelerationNorm-1);
 
-  Serial.print("acc: ");
-  Serial.print(accelerationGravityless);
-  Serial.println("");
+  // Serial.print("acc: ");
+  // Serial.print(accelerationGravityless);
+  // Serial.println("");
   if(currentMode == MODE_ALLUME){
     stopRonron();
     startBattement();
