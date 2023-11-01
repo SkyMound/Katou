@@ -22,6 +22,11 @@
 #define RONRON_THRESHOLD 0.6
 #define NO_INTERACTION_THRESHOLD 0.15
 
+#define RONRON_VOLUME 30
+#define ALLUME_VOLUME 15 
+#define ON_HAND_VOLUME 20  
+#define ENERVE_VOLUME 25
+
 typedef enum{
   MODE_ALLUME = (0),
   MODE_DANS_LES_MAINS = (1),
@@ -77,7 +82,7 @@ void loop() {
     stopRonron();
     startBattement();
     if(currentTime-lastMeow > ALLUME_MIAULEMENT_FREQ) {
-      myDFPlayer.volume(15);
+      myDFPlayer.volume(ALLUME_VOLUME);
       myDFPlayer.play(5);
       lastMeow = currentTime;
     }
@@ -97,12 +102,12 @@ void loop() {
     stopRonron();
     startBattement();
     if(currentTime - lastMeow > DANS_LES_MAINS_MIAULEMENT_FREQ){
-      myDFPlayer.volume(20);
+      myDFPlayer.volume(ON_HAND_VOLUME);
       myDFPlayer.play(1);
       lastMeow = currentTime;
     }
     if(!onHandMeow){
-      myDFPlayer.volume(20);
+      myDFPlayer.volume(ON_HAND_VOLUME);
       myDFPlayer.play(1);
       lastMeow = currentTime;
       onHandMeow = true;
@@ -134,7 +139,7 @@ void loop() {
     if(!isRonronning){
       isRonronning = true;
       Serial.println("Ronronnement");
-      myDFPlayer.volume(30);
+      myDFPlayer.volume(RONRON_VOLUME);
       myDFPlayer.loop(7);      
     }
     isRonronning = true;
@@ -160,7 +165,7 @@ void loop() {
     stopRonron();
     startBattement();
     if(!hasAngryMeow){
-      myDFPlayer.volume(25);
+      myDFPlayer.volume(ENERVE_VOLUME);
       myDFPlayer.play(6);
       hasAngryMeow = true;
     }
