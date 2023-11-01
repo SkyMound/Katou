@@ -5,6 +5,9 @@
 #include "respiration.hpp"
 #include "miaulement.hpp"
 
+// TODO miaulement debut mode dans les mains
+// BUG ENERVE
+
 #define ALLUME_MIAULEMENT_FREQ 30000
 #define DANS_LES_MAINS_MIAULEMENT_FREQ 20000
 
@@ -14,7 +17,7 @@
 #define ENERVE_TIMER 15000
 #define DANS_LES_MAINS_TIMER_MIN 5000
 
-#define ENERVE_THRESHOLD 2.0
+#define ENERVE_THRESHOLD 1.8
 #define DANS_LES_MAINS_THRESHOLD 0.5
 #define RONRON_THRESHOLD 0.7
 #define NO_INTERACTION_THRESHOLD 0.15
@@ -31,6 +34,7 @@ int lastMeow = millis();
 int modeChanged = millis();
 KatouMode currentMode = MODE_ALLUME;
 bool hasAngryMeow = false;
+bool onHandMeow = false;
 bool isRonronning = false;
 
 
@@ -66,9 +70,9 @@ void loop() {
   float accelerationNorm = sqrt(pow(mma.x_g,2)+pow(mma.y_g,2)+pow(mma.z_g,2));
   float accelerationGravityless = abs(accelerationNorm-1);
 
-  // Serial.print("acc: ");
-  // Serial.print(accelerationGravityless);
-  // Serial.println("");
+  Serial.print("acc: ");
+  Serial.print(accelerationGravityless);
+  Serial.println("");
   if(currentMode == MODE_ALLUME){
     stopRonron();
     startBattement();
@@ -97,20 +101,29 @@ void loop() {
       myDFPlayer.play(1);
       lastMeow = currentTime;
     }
+    if(!onHandMeow){
+      myDFPlayer.volume(20);
+      myDFPlayer.play(1);
+      lastMeow = currentTime;
+      onHandMeow = true;
+    }
     if(accelerationGravityless < NO_INTERACTION_THRESHOLD ){
       if(currentTime - modeChanged > DANS_LES_MAINS_TIMER){
         currentMode = MODE_ALLUME;
+        onHandMeow = false;
         Serial.println("Mode allume");
         modeChanged = millis();
       }
     }
     else if(accelerationGravityless > ENERVE_THRESHOLD){
       currentMode = MODE_ENERVE;
+      onHandMeow = false;
       Serial.println("Mode enervé");
       modeChanged = millis();
     }
     else if(accelerationGravityless > RONRON_THRESHOLD && currentTime - modeChanged > DANS_LES_MAINS_TIMER_MIN){
       currentMode = MODE_RONRON;
+      onHandMeow = false;
       Serial.println("Mode ronron");
       modeChanged = millis();
     }
