@@ -75,9 +75,9 @@ void loop() {
   float accelerationNorm = sqrt(pow(mma.x_g,2)+pow(mma.y_g,2)+pow(mma.z_g,2));
   float accelerationGravityless = abs(accelerationNorm-1);
 
-  // Serial.print("acc: ");
-  // Serial.print(accelerationGravityless);
-  // Serial.println("");
+  Serial.print("acc: ");
+  Serial.print(accelerationGravityless);
+  Serial.println("");
   if(currentMode == MODE_ALLUME){
     stopRonron();
     startBattement();
